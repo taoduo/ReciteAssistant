@@ -1,2 +1,2 @@
 # ReciteAssistant
-Latex-ed Flashcards
+Latex-ed Flashcards. IntelliJ JavaFX Project.
