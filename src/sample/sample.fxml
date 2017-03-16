@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
@@ -10,11 +12,20 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
    <children>
-      <HBox layoutX="14.0" layoutY="1.0" prefHeight="20.0" prefWidth="560.0" spacing="10.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="10.0">
+      <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
          <children>
-            <TextField fx:id="latexInput" />
-            <Button mnemonicParsing="false" onAction="#addBtnClick" text="Add" />
+            <HBox prefHeight="20.0" prefWidth="560.0" spacing="10.0">
+               <children>
+                  <TextField fx:id="latexInput" />
+                  <Button mnemonicParsing="false" onAction="#addBtnClick" text="Add" />
+               </children>
+            </HBox>
+            <Pane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white;">
+               <children>
+                  <ImageView fx:id="latexPreview" fitHeight="150.0" fitWidth="577.0" pickOnBounds="true" preserveRatio="true" />
+               </children>
+            </Pane>
          </children>
-      </HBox>
+      </VBox>
    </children>
 </AnchorPane>
