@@ -6,27 +6,39 @@ import org.scilab.forge.jlatexmath.TeXConstants;
 import org.scilab.forge.jlatexmath.TeXFormula;
 import org.scilab.forge.jlatexmath.TeXIcon;
 
-import java.awt.Graphics2D;
-import java.awt.Insets;
-import java.awt.Color;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.*;
+import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
 public class Controller {
+    private Stage appStage;
+
+    private static final String NEW_CARD_BUFFER_PATH = "./.cards/";
+    private static final String BUFFER_HINT = NEW_CARD_BUFFER_PATH + "hints/";
+    private static final String BUFFER_ANS = NEW_CARD_BUFFER_PATH + "answers/";
+    private static final String FILE_TYPE = "png";
+
     @FXML
     private TextArea latexHint;
 
@@ -39,15 +51,23 @@ public class Controller {
     @FXML
     private ImageView answerPreview;
 
-    private Stage appStage;
+    @FXML
+    private ImageView reviewCurrent;
 
+    @FXML
+    private javafx.scene.control.Label reviewIndexLabel;
+
+    /* review window status variables */
+    // current hint index
+    private int reviewCurrentHintIndex = -1;
+    // true: hint; false: answer
+    private boolean reviewCurrentAnswerOrHint = true;
+    // all hint files
+    private File[] reviewHints;
+
+    /* new card window status viables */
     private boolean hintTextChanged = true;
     private boolean answerTextChanged = true;
-
-    private static final String NEW_CARD_BUFFER_PATH = "./.cards/";
-    private static final String BUFFER_HINT = NEW_CARD_BUFFER_PATH + "hints/";
-    private static final String BUFFER_ANS = NEW_CARD_BUFFER_PATH + "answers/";
-    private static final String FILE_TYPE = "png";
 
     @FXML
     public void previewBtnClick() {
@@ -90,6 +110,42 @@ public class Controller {
     public void answerTextChanged() {
         answerTextChanged = true;
     }
+    @FXML
+    public void reviewCardKeyType(KeyEvent event) {
+        if (event.getCode() == KeyCode.LEFT) {
+            // previous card
+            if (reviewCurrentHintIndex > 0) {
+                reviewCurrentHintIndex--;
+                reviewShowImage(reviewHints[reviewCurrentHintIndex]);
+            } else {
+                showSuccessAlert("This the start of all cards");
+            }
+        } else if (event.getCode() == KeyCode.RIGHT) {
+            // next card
+            if (reviewCurrentHintIndex < reviewHints.length - 1) {
+                reviewCurrentHintIndex++;
+                reviewShowImage(reviewHints[reviewCurrentHintIndex]);
+            } else {
+                showSuccessAlert("We reached the end of all cards");
+            }
+        } else if (event.getCode() == KeyCode.SPACE) {
+            if (reviewCurrentAnswerOrHint) {
+                // hint->answer
+                File currentHintFile = reviewHints[reviewCurrentHintIndex];
+                File currentAnswerFile = new File(new File(currentHintFile.getParent()).getParent(),
+                        "/answers/" + currentHintFile.getName());
+                if (currentAnswerFile.exists()) {
+                    reviewShowImage(currentAnswerFile);
+                } else {
+                    showErrorAlert(new FileNotFoundException("Answer file is not Found"));
+                }
+            } else {
+                // answer->hint
+                reviewShowImage(reviewHints[reviewCurrentHintIndex]);
+            }
+            reviewCurrentAnswerOrHint = !reviewCurrentAnswerOrHint;
+        }
+    }
 
     @FXML
     public void exportBtnClick() {
@@ -123,6 +179,45 @@ public class Controller {
         }
     }
 
+    @FXML
+    public void importBtnClick() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Export Cards");
+        File target = directoryChooser.showDialog(this.appStage);
+        if (target != null && target.isDirectory()) {
+            File hintFolder = new File(target, "/hints");
+            if (hintFolder.exists()) {
+                File[] hints = hintFolder.listFiles((f)->f.getName().endsWith("." + FILE_TYPE));
+                if (hints != null && hints.length != 0) {
+                    reviewHints = hints;
+                    reviewCurrentHintIndex = 0;
+                    reviewCurrentAnswerOrHint = true;
+                    reviewShowImage(reviewHints[reviewCurrentHintIndex]);
+                } else {
+                    showErrorAlert(new Exception("Hints folder is empty"));
+                }
+            } else {
+                showErrorAlert(new FileNotFoundException("Hints folder is not found"));
+            }
+        }
+    }
+
+    @FXML
+    public void shuffleBtnClick() {
+        Random rnd = ThreadLocalRandom.current();
+        for (int i = reviewHints.length - 1; i > 0; i--)
+        {
+            int index = rnd.nextInt(i + 1);
+            // Simple swap
+            File a = reviewHints[index];
+            reviewHints[index] = reviewHints[i];
+            reviewHints[i] = a;
+        }
+        reviewCurrentHintIndex = 0;
+        reviewCurrentAnswerOrHint = true;
+        reviewShowImage(reviewHints[0]);
+    }
+
     private void refreshHint() {
         if (hintTextChanged) {
             String latex = latexHint.getText();
@@ -136,6 +231,15 @@ public class Controller {
             String latex = latexAnswer.getText();
             answerPreview.setImage(getImageFromLatex(latex));
             answerTextChanged = false;
+        }
+    }
+
+    private void reviewShowImage(File image) {
+        try {
+            reviewCurrent.setImage(SwingFXUtils.toFXImage(ImageIO.read(image), null));
+            reviewIndexLabel.setText((reviewCurrentHintIndex + 1) + "/" + reviewHints.length);
+        } catch (IOException e) {
+            showErrorAlert(e);
         }
     }
 

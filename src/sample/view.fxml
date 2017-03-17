@@ -10,12 +10,11 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 
-
 <TabPane prefHeight="600.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
    <tabs>
       <Tab text="New Cards">
          <content>
-            <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="567.0" prefWidth="800.0">
+            <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="570.0" prefWidth="800.0">
                <children>
                   <VBox layoutX="10.0" layoutY="10.0" spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                      <children>
@@ -51,6 +50,30 @@
             </AnchorPane>
          </content>
       </Tab>
-      <Tab text="Review Cards" />
+      <Tab text="Review Cards">
+         <content>
+            <AnchorPane onKeyTyped="#reviewCardKeyType" prefHeight="472.0" prefWidth="770.0">
+               <children>
+                  <VBox prefHeight="543.0" prefWidth="770.0" spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                           <children>
+                              <Button mnemonicParsing="false" onAction="#importBtnClick" text="Import" />
+                              <Button mnemonicParsing="false" onAction="#shuffleBtnClick" text="Shuffle" />
+                              <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                              <Label fx:id="reviewIndexLabel" text="0/0" />
+                           </children>
+                        </HBox>
+                        <AnchorPane style="-fx-border-color: black;">
+                           <children>
+                              <ImageView fx:id="reviewCurrent" fitHeight="506.0" fitWidth="779.0" pickOnBounds="true" preserveRatio="true" VBox.vgrow="ALWAYS" />
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </VBox>
+               </children>
+            </AnchorPane>
+         </content>
+      </Tab>
    </tabs>
 </TabPane>
