@@ -110,40 +110,44 @@ public class Controller {
     public void answerTextChanged() {
         answerTextChanged = true;
     }
+
     @FXML
     public void reviewCardKeyType(KeyEvent event) {
-        if (event.getCode() == KeyCode.LEFT) {
-            // previous card
-            if (reviewCurrentHintIndex > 0) {
-                reviewCurrentHintIndex--;
-                reviewShowImage(reviewHints[reviewCurrentHintIndex]);
-            } else {
-                showSuccessAlert("This the start of all cards");
-            }
-        } else if (event.getCode() == KeyCode.RIGHT) {
-            // next card
-            if (reviewCurrentHintIndex < reviewHints.length - 1) {
-                reviewCurrentHintIndex++;
-                reviewShowImage(reviewHints[reviewCurrentHintIndex]);
-            } else {
-                showSuccessAlert("We reached the end of all cards");
-            }
-        } else if (event.getCode() == KeyCode.SPACE) {
-            if (reviewCurrentAnswerOrHint) {
-                // hint->answer
-                File currentHintFile = reviewHints[reviewCurrentHintIndex];
-                File currentAnswerFile = new File(new File(currentHintFile.getParent()).getParent(),
-                        "/answers/" + currentHintFile.getName());
-                if (currentAnswerFile.exists()) {
-                    reviewShowImage(currentAnswerFile);
+        switch (event.getCharacter()) {
+            case "a":
+                // previous card
+                if (reviewCurrentHintIndex > 0) {
+                    reviewCurrentHintIndex--;
                 } else {
-                    showErrorAlert(new FileNotFoundException("Answer file is not Found"));
+                    reviewCurrentHintIndex = reviewHints.length - 1;
                 }
-            } else {
-                // answer->hint
                 reviewShowImage(reviewHints[reviewCurrentHintIndex]);
-            }
-            reviewCurrentAnswerOrHint = !reviewCurrentAnswerOrHint;
+                break;
+            case "d":
+                // next card
+                if (reviewCurrentHintIndex < reviewHints.length - 1) {
+                    reviewCurrentHintIndex++;
+                } else {
+                    reviewCurrentHintIndex = 0;
+                }
+                reviewShowImage(reviewHints[reviewCurrentHintIndex]);
+                break;
+            case "j":
+                if (reviewCurrentAnswerOrHint) {
+                    // hint->answer
+                    File currentHintFile = reviewHints[reviewCurrentHintIndex];
+                    File currentAnswerFile = new File(new File(currentHintFile.getParent()).getParent(),
+                            "/answers/" + currentHintFile.getName());
+                    if (currentAnswerFile.exists()) {
+                        reviewShowImage(currentAnswerFile);
+                    } else {
+                        showErrorAlert(new FileNotFoundException("Answer file is not Found"));
+                    }
+                } else {
+                    // answer->hint
+                    reviewShowImage(reviewHints[reviewCurrentHintIndex]);
+                }
+                reviewCurrentAnswerOrHint = !reviewCurrentAnswerOrHint;
         }
     }
 
