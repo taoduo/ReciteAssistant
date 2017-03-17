@@ -3,15 +3,17 @@ package sample;
 
 import org.scilab.forge.jlatexmath.ParseException;
 import org.scilab.forge.jlatexmath.TeXConstants;
+import org.scilab.forge.jlatexmath.TeXEnvironment;
 import org.scilab.forge.jlatexmath.TeXFormula;
 import org.scilab.forge.jlatexmath.TeXIcon;
+import org.scilab.forge.jlatexmath.TeXSymbolParser;
 
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
+import java.util.Date;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -35,6 +37,15 @@ public class Controller {
     @FXML
     private ImageView answerPreview;
 
+    private boolean hintTextChanged = true;
+    private boolean answerTextChanged = true;
+
+    private static final String CARD_PATH = "./.cards/";
+    private static final String HINT_PATH = CARD_PATH + "/hints/";
+    private static final String ANSWER_PATH = CARD_PATH + "/answers/";
+
+    private static final String FILE_TYPE = "png";
+
     @FXML
     public void previewBtnClick() {
         refreshHint();
@@ -43,23 +54,56 @@ public class Controller {
 
     @FXML
     public void saveBtnClick() {
-//        File file = new File("Example1.png");
-//        try {
-//            ImageIO.write(image, "png", file.getAbsoluteFile());
-//        } catch (IOException ex) { }
+        String fileName = Long.toString(new Date().getTime());
+        refreshHint();
+        refreshAnswer();
+        try {
+            new File(HINT_PATH).mkdirs();
+            new File(ANSWER_PATH).mkdirs();
+            File hint = new File(HINT_PATH + fileName + "." + FILE_TYPE);
+            File answer = new File(ANSWER_PATH + fileName + "." + FILE_TYPE);
+            ImageIO.write(SwingFXUtils.fromFXImage(hintPreview.getImage(), null), FILE_TYPE, hint.getAbsoluteFile());
+            ImageIO.write(SwingFXUtils.fromFXImage(answerPreview.getImage(), null), FILE_TYPE, answer.getAbsoluteFile());
+            latexHint.setText("");
+            latexAnswer.setText("");
+            hintTextChanged = true;
+            answerTextChanged = true;
+            refreshHint();
+            refreshAnswer();
+            showSuccessAlert("Flash Card Saved");
+        } catch (Exception e) {
+            showErrorAlert(e);
+        }
+    }
+
+    @FXML
+    public void hintTextChanged() {
+        hintTextChanged = true;
+    }
+
+    @FXML
+    public void answerTextChanged() {
+        answerTextChanged = true;
     }
 
     private void refreshHint() {
-        String latex = latexHint.getText();
-        hintPreview.setImage(getImageFromLatex(latex));
+        if (hintTextChanged) {
+            String latex = latexHint.getText();
+            hintPreview.setImage(getImageFromLatex(latex));
+            hintTextChanged = false;
+        }
     }
 
     private void refreshAnswer() {
-        String latex = latexAnswer.getText();
-        answerPreview.setImage(getImageFromLatex(latex));
+        if (answerTextChanged) {
+            String latex = latexAnswer.getText();
+            answerPreview.setImage(getImageFromLatex(latex));
+            answerTextChanged = false;
+        }
     }
 
     private Image getImageFromLatex(String latex) {
+
         Image image = null;
         try {
             TeXFormula formula = new TeXFormula(latex);
@@ -74,16 +118,24 @@ public class Controller {
             icon.paintIcon(jl, g2, 0, 0);
             image = SwingFXUtils.toFXImage(bufferedImage, null);
         } catch (ParseException e) {
-            showErrorAlert(e.getClass().toString(), e.getMessage());
+            showErrorAlert(e);
         }
         return image;
     }
 
-    private void showErrorAlert(String title, String content) {
+    private void showErrorAlert(Exception e) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error Message");
-        alert.setHeaderText(title);
-        alert.setContentText(content);
+        alert.setHeaderText(e.getClass().toString());
+        alert.setContentText(e.getMessage());
+        alert.showAndWait();
+    }
+
+    private void showSuccessAlert(String msg) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Success");
+        alert.setHeaderText(null);
+        alert.setContentText(msg);
         alert.showAndWait();
     }
 }

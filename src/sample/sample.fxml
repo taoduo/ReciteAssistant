@@ -24,14 +24,14 @@
                               <VBox prefHeight="510.0" prefWidth="409.0" spacing="5.0">
                                  <children>
                                     <Label text="Hint:" />
-                                    <TextArea fx:id="latexHint" prefHeight="100.0" prefWidth="290.0" />
+                                    <TextArea fx:id="latexHint" onKeyTyped="#hintTextChanged" prefHeight="100.0" prefWidth="290.0" />
                                     <ImageView fx:id="hintPreview" fitHeight="389.0" fitWidth="388.0" pickOnBounds="true" preserveRatio="true" VBox.vgrow="ALWAYS" />
                                  </children>
                               </VBox>
                               <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0">
                                  <children>
                                     <Label text="Answer:" />
-                                    <TextArea fx:id="latexAnswer" prefHeight="100.0" prefWidth="290.0" />
+                                    <TextArea fx:id="latexAnswer" onKeyTyped="#answerTextChanged" prefHeight="100.0" prefWidth="290.0" />
                                     <ImageView fx:id="answerPreview" fitHeight="389.0" fitWidth="388.0" pickOnBounds="true" preserveRatio="true" VBox.vgrow="ALWAYS" />
                                  </children>
                               </VBox>
