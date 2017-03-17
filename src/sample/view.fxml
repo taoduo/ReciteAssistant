@@ -37,11 +37,12 @@
                               </VBox>
                            </items>
                         </SplitPane>
-                        <HBox>
+                        <HBox spacing="10.0">
                            <children>
                               <Button mnemonicParsing="false" onAction="#previewBtnClick" text="Preview" />
                               <Region prefHeight="0.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
                               <Button alignment="TOP_CENTER" mnemonicParsing="false" onAction="#saveBtnClick" text="Save" />
+                              <Button mnemonicParsing="false" onAction="#exportBtnClick" text="Export" />
                            </children>
                         </HBox>
                      </children>

@@ -3,16 +3,16 @@ package sample;
 
 import org.scilab.forge.jlatexmath.ParseException;
 import org.scilab.forge.jlatexmath.TeXConstants;
-import org.scilab.forge.jlatexmath.TeXEnvironment;
 import org.scilab.forge.jlatexmath.TeXFormula;
 import org.scilab.forge.jlatexmath.TeXIcon;
-import org.scilab.forge.jlatexmath.TeXSymbolParser;
 
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Date;
 
 import javax.imageio.ImageIO;
@@ -23,6 +23,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.*;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
 
 public class Controller {
     @FXML
@@ -37,13 +39,14 @@ public class Controller {
     @FXML
     private ImageView answerPreview;
 
+    private Stage appStage;
+
     private boolean hintTextChanged = true;
     private boolean answerTextChanged = true;
 
-    private static final String CARD_PATH = "./.cards/";
-    private static final String HINT_PATH = CARD_PATH + "/hints/";
-    private static final String ANSWER_PATH = CARD_PATH + "/answers/";
-
+    private static final String NEW_CARD_BUFFER_PATH = "./.cards/";
+    private static final String BUFFER_HINT = NEW_CARD_BUFFER_PATH + "hints/";
+    private static final String BUFFER_ANS = NEW_CARD_BUFFER_PATH + "answers/";
     private static final String FILE_TYPE = "png";
 
     @FXML
@@ -58,10 +61,12 @@ public class Controller {
         refreshHint();
         refreshAnswer();
         try {
-            new File(HINT_PATH).mkdirs();
-            new File(ANSWER_PATH).mkdirs();
-            File hint = new File(HINT_PATH + fileName + "." + FILE_TYPE);
-            File answer = new File(ANSWER_PATH + fileName + "." + FILE_TYPE);
+            File hintDirectory = new File(BUFFER_HINT);
+            File answerDirectory = new File(BUFFER_ANS);
+            hintDirectory.mkdirs();
+            answerDirectory.mkdirs();
+            File hint = new File(hintDirectory, fileName + "." + FILE_TYPE);
+            File answer = new File(answerDirectory + fileName + "." + FILE_TYPE);
             ImageIO.write(SwingFXUtils.fromFXImage(hintPreview.getImage(), null), FILE_TYPE, hint.getAbsoluteFile());
             ImageIO.write(SwingFXUtils.fromFXImage(answerPreview.getImage(), null), FILE_TYPE, answer.getAbsoluteFile());
             latexHint.setText("");
@@ -84,6 +89,38 @@ public class Controller {
     @FXML
     public void answerTextChanged() {
         answerTextChanged = true;
+    }
+
+    @FXML
+    public void exportBtnClick() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Export Cards");
+        File target = directoryChooser.showDialog(this.appStage);
+        if (target != null && target.isDirectory()) {
+            try {
+                File[] hints = new File(BUFFER_HINT).listFiles();
+                File[] answers = new File(BUFFER_ANS).listFiles();
+                if (hints != null) {
+                    File targetHints = new File(target.getAbsolutePath() + "/hints/");
+                    targetHints.mkdirs();
+                    for (File hint : hints) {
+                        Files.copy(hint.toPath(), new File(targetHints, hint.getName()).toPath());
+                        hint.delete();
+                    }
+                }
+                if (answers != null) {
+                    File targetAnswers = new File(target.getAbsolutePath() + "/answers/");
+                    targetAnswers.mkdirs();
+                    for (File answer : answers) {
+                        Files.copy(answer.toPath(), new File(targetAnswers, answer.getName()).toPath());
+                        answer.delete();
+                    }
+                }
+                showSuccessAlert("Export Successful. Cards saved to " + target.getAbsolutePath());
+            } catch (IOException e) {
+                showErrorAlert(e);
+            }
+        }
     }
 
     private void refreshHint() {
@@ -121,6 +158,10 @@ public class Controller {
             showErrorAlert(e);
         }
         return image;
+    }
+
+    void setAppStage(Stage stage) {
+        this.appStage = stage;
     }
 
     private void showErrorAlert(Exception e) {
