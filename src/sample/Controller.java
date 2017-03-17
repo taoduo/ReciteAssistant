@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -122,6 +121,7 @@ public class Controller {
                     reviewCurrentHintIndex = reviewHints.length - 1;
                 }
                 reviewShowImage(reviewHints[reviewCurrentHintIndex]);
+                reviewCurrentAnswerOrHint = true;
                 break;
             case "d":
                 // next card
@@ -130,6 +130,7 @@ public class Controller {
                 } else {
                     reviewCurrentHintIndex = 0;
                 }
+                reviewCurrentAnswerOrHint = true;
                 reviewShowImage(reviewHints[reviewCurrentHintIndex]);
                 break;
             case "j":
