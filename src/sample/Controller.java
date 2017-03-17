@@ -25,7 +25,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.*;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
