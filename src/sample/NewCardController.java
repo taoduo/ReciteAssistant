@@ -107,6 +107,36 @@ public class NewCardController extends Controller {
         }
     }
 
+    @FXML
+    public void clearBtnClick() {
+        try {
+            if (showConfirmAlert("Are you sure to clear buffer?")) {
+                deleteDirectory(new File(NEW_CARD_BUFFER_PATH));
+                showSuccessAlert("Buffer Cleared");
+            }
+        } catch (Exception e) {
+            showErrorAlert(e);
+        }
+
+    }
+
+    private boolean deleteDirectory(File directory) {
+        if(directory.exists()){
+            File[] files = directory.listFiles();
+            if(null!=files) {
+                for(int i=0; i<files.length; i++) {
+                    if(files[i].isDirectory()) {
+                        deleteDirectory(files[i]);
+                    }
+                    else {
+                        files[i].delete();
+                    }
+                }
+            }
+        }
+        return(directory.delete());
+    }
+
     private void refreshHint() {
         if (hintTextChanged) {
             String latex = latexHint.getText();

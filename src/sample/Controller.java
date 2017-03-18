@@ -7,6 +7,7 @@ import org.scilab.forge.jlatexmath.TeXIcon;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Optional;
 
 import javax.swing.*;
 
@@ -60,5 +61,14 @@ class Controller {
         alert.setHeaderText(null);
         alert.setContentText(msg);
         alert.showAndWait();
+    }
+
+    boolean showConfirmAlert(String msg) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirm");
+        alert.setHeaderText(null);
+        alert.setContentText(msg);
+        Optional<ButtonType> result = alert.showAndWait();
+        return result.map((r)->r == ButtonType.OK).orElse(false);
     }
 }

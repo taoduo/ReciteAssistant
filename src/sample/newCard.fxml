@@ -38,6 +38,7 @@
                         <Region prefHeight="0.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
                         <Button alignment="TOP_CENTER" mnemonicParsing="false" onAction="#saveBtnClick" text="Save" />
                         <Button mnemonicParsing="false" onAction="#exportBtnClick" text="Export" />
+                  <Button cancelButton="true" mnemonicParsing="false" onAction="#clearBtnClick" text="Clear Buffer" />
                     </children>
                 </HBox>
             </children>
