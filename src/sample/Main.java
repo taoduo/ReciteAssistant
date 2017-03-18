@@ -15,8 +15,7 @@ public class Main extends Application {
 
         // pass stage into controllers
         Parent root = loader.load();
-        Controller controller = loader.getController();
-        controller.setAppStage(primaryStage);
+        Controller.setAppStage(primaryStage);
 
         // start the application
         primaryStage.setTitle("Recite Assistant");
