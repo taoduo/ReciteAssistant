@@ -18,6 +18,7 @@
                   <Button mnemonicParsing="false" onAction="#importBtnClick" text="Import" />
                   <Button mnemonicParsing="false" onAction="#shuffleBtnClick" text="Shuffle" />
             <Button mnemonicParsing="false" onAction="#reviewCurrentBtnClick" text="Current" />
+            <Button mnemonicParsing="false" onAction="#deleteBtnClick" text="Delete" />
                   <Region prefWidth="200.0" HBox.hgrow="ALWAYS" />
                   <Label fx:id="reviewIndexLabel" text="0/0" />
               </children>

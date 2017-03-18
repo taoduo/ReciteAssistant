@@ -137,16 +137,37 @@ public class ReviewCardController extends Controller {
         importDirectory(new File(NEW_CARD_BUFFER_PATH));
     }
 
+    @FXML
+    public void deleteBtnClick() {
+        File currentHintFile = reviewHints[reviewCurrentHintIndex];
+        File currentAnswerFile = new File(new File(currentHintFile.getParent()).getParent(),
+                "/answers/" + currentHintFile.getName());
+        currentHintFile.delete();
+        currentAnswerFile.delete();
+        importDirectory(currentHintFile.getParentFile().getParentFile());
+        if (reviewCurrentHintIndex > reviewHints.length - 1) {
+            reviewCurrentHintIndex = reviewHints.length - 1;
+        }
+        reviewCurrentAnswerOrHint = true;
+        if (reviewHints.length != 0) {
+            reviewShowImage(reviewHints[reviewCurrentHintIndex]);
+        } else {
+            reviewShowImage((Image) null);
+        }
+    }
+
     private void importDirectory(File dir) {
         if (dir != null && dir.isDirectory()) {
             File hintFolder = new File(dir, "/hints");
             if (hintFolder.exists()) {
                 File[] hints = hintFolder.listFiles((f)->f.getName().endsWith("." + FILE_TYPE));
-                if (hints != null && hints.length != 0) {
+                if (hints != null) {
                     reviewHints = hints;
                     reviewCurrentHintIndex = 0;
                     reviewCurrentAnswerOrHint = true;
-                    reviewShowImage(reviewHints[reviewCurrentHintIndex]);
+                    if (hints.length != 0) {
+                        reviewShowImage(reviewHints[reviewCurrentHintIndex]);
+                    }
                 } else {
                     showErrorAlert(new Exception("Hints folder is empty"));
                 }
