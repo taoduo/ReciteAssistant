@@ -12,7 +12,6 @@ import javax.imageio.ImageIO;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
@@ -50,9 +49,7 @@ public class ReviewCardController extends Controller {
                 } else {
                     reviewCurrentHintIndex = reviewHints.length - 1;
                 }
-                reviewShowImage(reviewHints[reviewCurrentHintIndex]);
                 reviewCurrentAnswerOrHint = true;
-                refreshAnswerOrHintLabel();
                 break;
             case "d":
                 // next card
@@ -62,26 +59,9 @@ public class ReviewCardController extends Controller {
                     reviewCurrentHintIndex = 0;
                 }
                 reviewCurrentAnswerOrHint = true;
-                refreshAnswerOrHintLabel();
-                reviewShowImage(reviewHints[reviewCurrentHintIndex]);
                 break;
             case "j":
-                if (reviewCurrentAnswerOrHint) {
-                    // hint->answer
-                    File currentHintFile = reviewHints[reviewCurrentHintIndex];
-                    File currentAnswerFile = new File(new File(currentHintFile.getParent()).getParent(),
-                            "/answers/" + currentHintFile.getName());
-                    if (currentAnswerFile.exists()) {
-                        reviewShowImage(currentAnswerFile);
-                    } else {
-                        showErrorAlert(new FileNotFoundException("Answer file is not Found"));
-                    }
-                } else {
-                    // answer->hint
-                    reviewShowImage(reviewHints[reviewCurrentHintIndex]);
-                }
                 reviewCurrentAnswerOrHint = !reviewCurrentAnswerOrHint;
-                refreshAnswerOrHintLabel();
                 break;
             case "k":
                 // mark the card
@@ -91,11 +71,6 @@ public class ReviewCardController extends Controller {
                             "/answers/" + currentHintFile.getName());
                     markCard(currentHintFile);
                     markCard(currentAnswerFile);
-                    if (reviewCurrentAnswerOrHint) {
-                        reviewShowImage(currentHintFile);
-                    } else {
-                        reviewShowImage(currentAnswerFile);
-                    }
                 }
                 break;
             case "u":
@@ -106,14 +81,10 @@ public class ReviewCardController extends Controller {
                             "/answers/" + currentHintFile.getName());
                     unMarkCard(currentHintFile);
                     unMarkCard(currentAnswerFile);
-                    if (reviewCurrentAnswerOrHint) {
-                        reviewShowImage(currentHintFile);
-                    } else {
-                        reviewShowImage(currentAnswerFile);
-                    }
                 }
                 break;
         }
+        refreshView();
     }
 
     @FXML
@@ -122,6 +93,9 @@ public class ReviewCardController extends Controller {
         directoryChooser.setTitle("Import Cards");
         File target = directoryChooser.showDialog(appStage);
         importDirectory(target);
+        reviewCurrentHintIndex = reviewHints.length != 0 ? 0 : -1;
+        reviewCurrentAnswerOrHint = true;
+        refreshView();
     }
 
     @FXML
@@ -136,35 +110,35 @@ public class ReviewCardController extends Controller {
         }
         reviewCurrentHintIndex = 0;
         reviewCurrentAnswerOrHint = true;
-        refreshAnswerOrHintLabel();
-        reviewShowImage(reviewHints[0]);
+        refreshView();
     }
 
     @FXML
     public void reviewCurrentBtnClick() {
         importDirectory(new File(NEW_CARD_BUFFER_PATH));
+        reviewCurrentHintIndex = reviewHints.length != 0 ? 0 : -1;
+        reviewCurrentAnswerOrHint = true;
+        refreshView();
     }
 
     @FXML
     public void deleteBtnClick() {
-        File currentHintFile = reviewHints[reviewCurrentHintIndex];
-        File currentAnswerFile = new File(new File(currentHintFile.getParent()).getParent(),
-                "/answers/" + currentHintFile.getName());
-        currentHintFile.delete();
-        currentAnswerFile.delete();
-        importDirectory(currentHintFile.getParentFile().getParentFile());
-        if (reviewCurrentHintIndex > reviewHints.length - 1) {
-            reviewCurrentHintIndex = reviewHints.length - 1;
-        }
-        reviewCurrentAnswerOrHint = true;
-        refreshAnswerOrHintLabel();
-        if (reviewHints.length != 0) {
-            reviewShowImage(reviewHints[reviewCurrentHintIndex]);
-        } else {
-            reviewShowImage((Image) null);
+        if (reviewCurrentHintIndex != -1) {
+            File currentHintFile = reviewHints[reviewCurrentHintIndex];
+            File currentAnswerFile = new File(new File(currentHintFile.getParent()).getParent(),
+                    "/answers/" + currentHintFile.getName());
+            currentHintFile.delete();
+            currentAnswerFile.delete();
+            importDirectory(currentHintFile.getParentFile().getParentFile());
+            if (reviewCurrentHintIndex > reviewHints.length - 1) {
+                reviewCurrentHintIndex = reviewHints.length - 1;
+            }
+            reviewCurrentAnswerOrHint = true;
+            refreshView();
         }
     }
 
+    /* Import Helper */
     private void importDirectory(File dir) {
         if (dir != null && dir.isDirectory()) {
             File hintFolder = new File(dir, "/hints");
@@ -172,14 +146,6 @@ public class ReviewCardController extends Controller {
                 File[] hints = hintFolder.listFiles((f)->f.getName().endsWith("." + FILE_TYPE));
                 if (hints != null) {
                     reviewHints = hints;
-                    reviewCurrentHintIndex = 0;
-                    reviewCurrentAnswerOrHint = true;
-                    refreshAnswerOrHintLabel();
-                    if (hints.length != 0) {
-                        reviewShowImage(reviewHints[reviewCurrentHintIndex]);
-                    }
-                } else {
-                    showErrorAlert(new Exception("Hints folder is empty"));
                 }
             } else {
                 showErrorAlert(new FileNotFoundException("Hints folder is not found"));
@@ -187,6 +153,7 @@ public class ReviewCardController extends Controller {
         }
     }
 
+    /* Mark / Unmark methods */
     private void markCard(File image) {
         try {
             BufferedImage img = ImageIO.read(image);
@@ -238,6 +205,7 @@ public class ReviewCardController extends Controller {
         return new Color(scale, scale, scale);
     }
 
+    /* View methods */
     private void reviewShowImage(File image) {
         try {
             reviewCurrent.setImage(SwingFXUtils.toFXImage(ImageIO.read(image), null));
@@ -257,6 +225,22 @@ public class ReviewCardController extends Controller {
             answerOrHintLabel.setText("Hint:");
         } else {
             answerOrHintLabel.setText("Answer:");
+        }
+    }
+
+    private void refreshView() {
+        refreshAnswerOrHintLabel();
+        if (reviewCurrentHintIndex != -1) {
+            File currentHintFile = reviewHints[reviewCurrentHintIndex];
+            File currentAnswerFile = new File(new File(currentHintFile.getParent()).getParent(),
+                    "/answers/" + currentHintFile.getName());
+            if (reviewCurrentAnswerOrHint) {
+                reviewShowImage(currentHintFile);
+            } else {
+                reviewShowImage(currentAnswerFile);
+            }
+        } else {
+            reviewShowImage((Image) null);
         }
     }
 }
