@@ -1,5 +1,7 @@
 package sample;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -10,6 +12,7 @@ import javax.imageio.ImageIO;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.DirectoryChooser;
@@ -73,6 +76,24 @@ public class ReviewCardController extends Controller {
                 }
                 reviewCurrentAnswerOrHint = !reviewCurrentAnswerOrHint;
                 break;
+            case "k":
+                // mark the card
+                if (reviewCurrentHintIndex >= 0) {
+                    try {
+                        BufferedImage image = ImageIO.read(reviewHints[reviewCurrentHintIndex]);
+                        for (int i = 0; i < image.getWidth(); i++) {
+                            for (int j = 0; j < image.getHeight(); j++) {
+                                if (image.getRGB(i, j) != -1) {
+                                    image.setRGB(i, j, Color.RED.getRGB());
+                                }
+                            }
+                        }
+                        reviewShowImage(SwingFXUtils.toFXImage(image, null));
+                    } catch (IOException e) {
+                        showErrorAlert(e);
+                    }
+                }
+                break;
         }
     }
 
@@ -121,5 +142,10 @@ public class ReviewCardController extends Controller {
         } catch (IOException e) {
             showErrorAlert(e);
         }
+    }
+
+    private void reviewShowImage(Image image) {
+        reviewCurrent.setImage(image);
+        reviewIndexLabel.setText((reviewCurrentHintIndex + 1) + "/" + reviewHints.length);
     }
 }
