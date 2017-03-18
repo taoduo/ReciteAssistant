@@ -6,3 +6,14 @@ Latex-ed Flashcards. IntelliJ JavaFX Project.
 
 ## Review and Mark Cards
 ![Mark / Review Card](demo2.png)
+
+## Keys:
+A - Previous card
+
+D - Next card
+
+J - Check answer
+
+K - Mark card
+
+U - Unmark card
