@@ -50,7 +50,7 @@ public class NewCardController extends Controller {
             hintDirectory.mkdirs();
             answerDirectory.mkdirs();
             File hint = new File(hintDirectory, fileName + "." + FILE_TYPE);
-            File answer = new File(answerDirectory + fileName + "." + FILE_TYPE);
+            File answer = new File(answerDirectory, fileName + "." + FILE_TYPE);
             ImageIO.write(SwingFXUtils.fromFXImage(hintPreview.getImage(), null), FILE_TYPE, hint.getAbsoluteFile());
             ImageIO.write(SwingFXUtils.fromFXImage(answerPreview.getImage(), null), FILE_TYPE, answer.getAbsoluteFile());
             latexHint.setText("");
