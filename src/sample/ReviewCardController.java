@@ -92,10 +92,11 @@ public class ReviewCardController extends Controller {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Import Cards");
         File target = directoryChooser.showDialog(appStage);
-        importDirectory(target);
-        reviewCurrentHintIndex = reviewHints.length != 0 ? 0 : -1;
-        reviewCurrentAnswerOrHint = true;
-        refreshView();
+        if (importDirectory(target)) {
+            reviewCurrentHintIndex = reviewHints.length != 0 ? 0 : -1;
+            reviewCurrentAnswerOrHint = true;
+            refreshView();
+        }
     }
 
     @FXML
@@ -115,10 +116,12 @@ public class ReviewCardController extends Controller {
 
     @FXML
     public void reviewCurrentBtnClick() {
-        importDirectory(new File(NEW_CARD_BUFFER_PATH));
-        reviewCurrentHintIndex = reviewHints.length != 0 ? 0 : -1;
-        reviewCurrentAnswerOrHint = true;
-        refreshView();
+        File currentDir = new File(NEW_CARD_BUFFER_PATH);
+        if (currentDir.exists() && importDirectory(currentDir)) {
+            reviewCurrentHintIndex = reviewHints.length != 0 ? 0 : -1;
+            reviewCurrentAnswerOrHint = true;
+            refreshView();
+        }
     }
 
     @FXML
@@ -129,27 +132,34 @@ public class ReviewCardController extends Controller {
                     "/answers/" + currentHintFile.getName());
             currentHintFile.delete();
             currentAnswerFile.delete();
-            importDirectory(currentHintFile.getParentFile().getParentFile());
-            if (reviewCurrentHintIndex > reviewHints.length - 1) {
-                reviewCurrentHintIndex = reviewHints.length - 1;
+            if (importDirectory(currentHintFile.getParentFile().getParentFile())) {
+                if (reviewCurrentHintIndex > reviewHints.length - 1) {
+                    reviewCurrentHintIndex = reviewHints.length - 1;
+                }
+                reviewCurrentAnswerOrHint = true;
+                refreshView();
             }
-            reviewCurrentAnswerOrHint = true;
-            refreshView();
         }
     }
 
     /* Import Helper */
-    private void importDirectory(File dir) {
+    private boolean importDirectory(File dir) {
         if (dir != null && dir.isDirectory()) {
             File hintFolder = new File(dir, "/hints");
             if (hintFolder.exists()) {
                 File[] hints = hintFolder.listFiles((f)->f.getName().endsWith("." + FILE_TYPE));
                 if (hints != null) {
                     reviewHints = hints;
+                    return true;
+                } else {
+                    return false;
                 }
             } else {
                 showErrorAlert(new FileNotFoundException("Hints folder is not found"));
+                return false;
             }
+        } else {
+            return false;
         }
     }
 
