@@ -64,25 +64,14 @@ public class ReviewCardController extends Controller {
                 reviewCurrentAnswerOrHint = !reviewCurrentAnswerOrHint;
                 break;
             case "k":
-                // mark the card
+                // toggle marking the card
                 if (reviewCurrentHintIndex >= 0) {
                     File currentHintFile = reviewHints[reviewCurrentHintIndex];
                     File currentAnswerFile = new File(new File(currentHintFile.getParent()).getParent(),
                             "/answers/" + currentHintFile.getName());
-                    markCard(currentHintFile);
-                    markCard(currentAnswerFile);
+                    toggleMark(currentHintFile);
+                    toggleMark(currentAnswerFile);
                 }
-                break;
-            case "u":
-                // unmark the card
-                if (reviewCurrentHintIndex >= 0) {
-                    File currentHintFile = reviewHints[reviewCurrentHintIndex];
-                    File currentAnswerFile = new File(new File(currentHintFile.getParent()).getParent(),
-                            "/answers/" + currentHintFile.getName());
-                    unMarkCard(currentHintFile);
-                    unMarkCard(currentAnswerFile);
-                }
-                break;
         }
         refreshView();
     }
@@ -164,13 +153,13 @@ public class ReviewCardController extends Controller {
     }
 
     /* Mark / Unmark methods */
-    private void markCard(File image) {
+    private void toggleMark(File image) {
         try {
             BufferedImage img = ImageIO.read(image);
             for (int i = 0; i < img.getWidth(); i++) {
                 for (int j = 0; j < img.getHeight(); j++) {
                     Color ic = new Color(img.getRGB(i, j));
-                    Color scr = screenWithRed(ic);
+                    Color scr = toggleScreen(ic);
                     img.setRGB(i, j, scr.getRGB());
                 }
             }
@@ -180,39 +169,15 @@ public class ReviewCardController extends Controller {
         }
     }
 
-    private Color screenWithRed(Color img) {
+    private Color toggleScreen(Color img) {
         if (img.getRed() == 255 && img.getGreen() == img.getBlue()) {
-            return img;
+            Color red = Color.RED;
+            int scale = (img.getGreen() + img.getBlue()) / 2;
+            return new Color(scale, scale, scale);
         }
         Color red = Color.RED;
         int scale = (img.getRed() + img.getGreen() + img.getBlue()) / 3;
         return new Color(255, scale, scale);
-    }
-
-    private void unMarkCard(File image) {
-        try {
-            BufferedImage img = ImageIO.read(image);
-            for (int i = 0; i < img.getWidth(); i++) {
-                for (int j = 0; j < img.getHeight(); j++) {
-                    Color ic = new Color(img.getRGB(i, j));
-                    Color scr = removeRedScreen(ic);
-                    img.setRGB(i, j, scr.getRGB());
-                }
-            }
-            ImageIO.write(img, FILE_TYPE, image);
-        } catch (IOException e) {
-            showErrorAlert(e);
-        }
-    }
-
-    private Color removeRedScreen(Color img) {
-        Color red = Color.RED;
-        if (img.getGreen() != img.getBlue()) {
-            // not screened
-            return img;
-        }
-        int scale = (img.getGreen() + img.getBlue()) / 2;
-        return new Color(scale, scale, scale);
     }
 
     /* View methods */
