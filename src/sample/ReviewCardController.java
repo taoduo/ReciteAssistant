@@ -79,18 +79,15 @@ public class ReviewCardController extends Controller {
             case "k":
                 // mark the card
                 if (reviewCurrentHintIndex >= 0) {
-                    try {
-                        BufferedImage image = ImageIO.read(reviewHints[reviewCurrentHintIndex]);
-                        for (int i = 0; i < image.getWidth(); i++) {
-                            for (int j = 0; j < image.getHeight(); j++) {
-                                if (image.getRGB(i, j) != -1) {
-                                    image.setRGB(i, j, Color.RED.getRGB());
-                                }
-                            }
-                        }
-                        reviewShowImage(SwingFXUtils.toFXImage(image, null));
-                    } catch (IOException e) {
-                        showErrorAlert(e);
+                    File currentHintFile = reviewHints[reviewCurrentHintIndex];
+                    File currentAnswerFile = new File(new File(currentHintFile.getParent()).getParent(),
+                            "/answers/" + currentHintFile.getName());
+                    markCard(currentHintFile);
+                    markCard(currentAnswerFile);
+                    if (reviewCurrentAnswerOrHint) {
+                        reviewShowImage(currentHintFile);
+                    } else {
+                        reviewShowImage(currentAnswerFile);
                     }
                 }
                 break;
@@ -133,6 +130,28 @@ public class ReviewCardController extends Controller {
         reviewCurrentHintIndex = 0;
         reviewCurrentAnswerOrHint = true;
         reviewShowImage(reviewHints[0]);
+    }
+
+    private void markCard(File image) {
+        try {
+            BufferedImage img = ImageIO.read(image);
+            for (int i = 0; i < img.getWidth(); i++) {
+                for (int j = 0; j < img.getHeight(); j++) {
+                    Color ic = new Color(img.getRGB(i, j));
+                    Color scr = screenWithRed(ic);
+                    img.setRGB(i, j, scr.getRGB());
+                }
+            }
+            ImageIO.write(img, FILE_TYPE, image);
+        } catch (IOException e) {
+            showErrorAlert(e);
+        }
+    }
+
+    private Color screenWithRed(Color img) {
+        Color red = Color.RED;
+        int scale = (img.getRed() + img.getGreen() + img.getBlue()) / 3;
+        return new Color(255, scale, scale);
     }
 
     private void reviewShowImage(File image) {
