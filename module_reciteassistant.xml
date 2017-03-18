@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_reciteassistant" default="compile.module.reciteassistant">
+  <dirname property="module.reciteassistant.basedir" file="${ant.file.module_reciteassistant}"/>
+  
+  <property name="module.jdk.home.reciteassistant" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.reciteassistant" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.reciteassistant" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.reciteassistant" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="reciteassistant.output.dir" value="${module.reciteassistant.basedir}/out/production/ReciteAssistant"/>
+  <property name="reciteassistant.testoutput.dir" value="${module.reciteassistant.basedir}/out/test/ReciteAssistant"/>
+  
+  <path id="reciteassistant.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="reciteassistant.module.production.classpath">
+    <path refid="${module.jdk.classpath.reciteassistant}"/>
+    <pathelement location="${basedir}/lib/jlatexmath-1.0.3.jar"/>
+  </path>
+  
+  <path id="reciteassistant.runtime.production.module.classpath">
+    <pathelement location="${reciteassistant.output.dir}"/>
+    <pathelement location="${basedir}/lib/jlatexmath-1.0.3.jar"/>
+  </path>
+  
+  <path id="reciteassistant.module.classpath">
+    <path refid="${module.jdk.classpath.reciteassistant}"/>
+    <pathelement location="${reciteassistant.output.dir}"/>
+    <pathelement location="${basedir}/lib/jlatexmath-1.0.3.jar"/>
+  </path>
+  
+  <path id="reciteassistant.runtime.module.classpath">
+    <pathelement location="${reciteassistant.testoutput.dir}"/>
+    <pathelement location="${reciteassistant.output.dir}"/>
+    <pathelement location="${basedir}/lib/jlatexmath-1.0.3.jar"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.reciteassistant">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.reciteassistant">
+    <patternset refid="excluded.from.module.reciteassistant"/>
+  </patternset>
+  
+  <path id="reciteassistant.module.sourcepath">
+    <dirset dir="${module.reciteassistant.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.reciteassistant" depends="compile.module.reciteassistant.production,compile.module.reciteassistant.tests" description="Compile module ReciteAssistant"/>
+  
+  <target name="compile.module.reciteassistant.production" depends="register.custom.compilers" description="Compile module ReciteAssistant; production classes">
+    <mkdir dir="${reciteassistant.output.dir}"/>
+    <javac2 destdir="${reciteassistant.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.reciteassistant}/javac">
+      <compilerarg line="${compiler.args.reciteassistant}"/>
+      <bootclasspath refid="reciteassistant.module.bootclasspath"/>
+      <classpath refid="reciteassistant.module.production.classpath"/>
+      <src refid="reciteassistant.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.reciteassistant"/>
+    </javac2>
+    
+    <copy todir="${reciteassistant.output.dir}">
+      <fileset dir="${module.reciteassistant.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.reciteassistant.tests" depends="register.custom.compilers,compile.module.reciteassistant.production" description="compile module ReciteAssistant; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.reciteassistant" description="cleanup module">
+    <delete dir="${reciteassistant.output.dir}"/>
+    <delete dir="${reciteassistant.testoutput.dir}"/>
+  </target>
+</project>
