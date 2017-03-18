@@ -12,6 +12,7 @@ import javax.imageio.ImageIO;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
@@ -27,6 +28,9 @@ public class ReviewCardController extends Controller {
 
     @FXML
     private javafx.scene.control.Label reviewIndexLabel;
+
+    @FXML
+    private javafx.scene.control.Label answerOrHintLabel;
 
     /* review window status variables */
     // current hint index
@@ -48,6 +52,7 @@ public class ReviewCardController extends Controller {
                 }
                 reviewShowImage(reviewHints[reviewCurrentHintIndex]);
                 reviewCurrentAnswerOrHint = true;
+                refreshAnswerOrHintLabel();
                 break;
             case "d":
                 // next card
@@ -57,6 +62,7 @@ public class ReviewCardController extends Controller {
                     reviewCurrentHintIndex = 0;
                 }
                 reviewCurrentAnswerOrHint = true;
+                refreshAnswerOrHintLabel();
                 reviewShowImage(reviewHints[reviewCurrentHintIndex]);
                 break;
             case "j":
@@ -75,6 +81,7 @@ public class ReviewCardController extends Controller {
                     reviewShowImage(reviewHints[reviewCurrentHintIndex]);
                 }
                 reviewCurrentAnswerOrHint = !reviewCurrentAnswerOrHint;
+                refreshAnswerOrHintLabel();
                 break;
             case "k":
                 // mark the card
@@ -129,6 +136,7 @@ public class ReviewCardController extends Controller {
         }
         reviewCurrentHintIndex = 0;
         reviewCurrentAnswerOrHint = true;
+        refreshAnswerOrHintLabel();
         reviewShowImage(reviewHints[0]);
     }
 
@@ -149,6 +157,7 @@ public class ReviewCardController extends Controller {
             reviewCurrentHintIndex = reviewHints.length - 1;
         }
         reviewCurrentAnswerOrHint = true;
+        refreshAnswerOrHintLabel();
         if (reviewHints.length != 0) {
             reviewShowImage(reviewHints[reviewCurrentHintIndex]);
         } else {
@@ -165,6 +174,7 @@ public class ReviewCardController extends Controller {
                     reviewHints = hints;
                     reviewCurrentHintIndex = 0;
                     reviewCurrentAnswerOrHint = true;
+                    refreshAnswerOrHintLabel();
                     if (hints.length != 0) {
                         reviewShowImage(reviewHints[reviewCurrentHintIndex]);
                     }
@@ -240,5 +250,13 @@ public class ReviewCardController extends Controller {
     private void reviewShowImage(Image image) {
         reviewCurrent.setImage(image);
         reviewIndexLabel.setText((reviewCurrentHintIndex + 1) + "/" + reviewHints.length);
+    }
+
+    private void refreshAnswerOrHintLabel() {
+        if (reviewCurrentAnswerOrHint) {
+            answerOrHintLabel.setText("Hint:");
+        } else {
+            answerOrHintLabel.setText("Answer:");
+        }
     }
 }

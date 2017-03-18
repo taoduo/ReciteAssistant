@@ -12,7 +12,8 @@
 
 <AnchorPane onKeyTyped="#reviewCardKeyType" prefHeight="580.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.ReviewCardController">
     <children>
-            <ImageView fx:id="reviewCurrent" fitHeight="500.0" fitWidth="780.0" layoutX="11.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" y="1.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" VBox.vgrow="ALWAYS" />
+      <Label fx:id="answerOrHintLabel" text="Hint:" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
+            <ImageView fx:id="reviewCurrent" fitHeight="500.0" fitWidth="780.0" layoutX="11.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" y="1.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="30.0" VBox.vgrow="ALWAYS" />
           <HBox alignment="BOTTOM_LEFT" layoutX="10.0" layoutY="521.0" spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
               <children>
                   <Button mnemonicParsing="false" onAction="#importBtnClick" text="Import" />
