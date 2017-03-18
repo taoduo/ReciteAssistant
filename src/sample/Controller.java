@@ -17,7 +17,7 @@ import javafx.stage.Stage;
 
 class Controller {
     static Stage appStage;
-    private static final String NEW_CARD_BUFFER_PATH = "./.cards/";
+    static final String NEW_CARD_BUFFER_PATH = "./.cards/";
     static final String BUFFER_HINT = NEW_CARD_BUFFER_PATH + "hints/";
     static final String BUFFER_ANS = NEW_CARD_BUFFER_PATH + "answers/";
     static final String FILE_TYPE = "png";

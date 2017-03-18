@@ -112,24 +112,9 @@ public class ReviewCardController extends Controller {
     @FXML
     public void importBtnClick() {
         DirectoryChooser directoryChooser = new DirectoryChooser();
-        directoryChooser.setTitle("Export Cards");
+        directoryChooser.setTitle("Import Cards");
         File target = directoryChooser.showDialog(appStage);
-        if (target != null && target.isDirectory()) {
-            File hintFolder = new File(target, "/hints");
-            if (hintFolder.exists()) {
-                File[] hints = hintFolder.listFiles((f)->f.getName().endsWith("." + FILE_TYPE));
-                if (hints != null && hints.length != 0) {
-                    reviewHints = hints;
-                    reviewCurrentHintIndex = 0;
-                    reviewCurrentAnswerOrHint = true;
-                    reviewShowImage(reviewHints[reviewCurrentHintIndex]);
-                } else {
-                    showErrorAlert(new Exception("Hints folder is empty"));
-                }
-            } else {
-                showErrorAlert(new FileNotFoundException("Hints folder is not found"));
-            }
-        }
+        importDirectory(target);
     }
 
     @FXML
@@ -145,6 +130,30 @@ public class ReviewCardController extends Controller {
         reviewCurrentHintIndex = 0;
         reviewCurrentAnswerOrHint = true;
         reviewShowImage(reviewHints[0]);
+    }
+
+    @FXML
+    public void reviewCurrentBtnClick() {
+        importDirectory(new File(NEW_CARD_BUFFER_PATH));
+    }
+
+    private void importDirectory(File dir) {
+        if (dir != null && dir.isDirectory()) {
+            File hintFolder = new File(dir, "/hints");
+            if (hintFolder.exists()) {
+                File[] hints = hintFolder.listFiles((f)->f.getName().endsWith("." + FILE_TYPE));
+                if (hints != null && hints.length != 0) {
+                    reviewHints = hints;
+                    reviewCurrentHintIndex = 0;
+                    reviewCurrentAnswerOrHint = true;
+                    reviewShowImage(reviewHints[reviewCurrentHintIndex]);
+                } else {
+                    showErrorAlert(new Exception("Hints folder is empty"));
+                }
+            } else {
+                showErrorAlert(new FileNotFoundException("Hints folder is not found"));
+            }
+        }
     }
 
     private void markCard(File image) {
